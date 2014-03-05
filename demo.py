@@ -151,14 +151,14 @@ class EyeTracker(object):
         faces = cv.HaarDetectObjects(grayscale, self.face_cascade, self.storage, 1.2, 2, 0, (300, 250))
 
         if faces:
-            #print 'face detected!'
+            print 'face detected!'
             for f in faces:
                 rect(image, f, (0, 255, 0))
                 self.frames_since_face = 0
                 self.last_face_position = f
                 return f
         elif self.last_face_position:
-            #print 'can\'t find face, using old postion'
+            print 'can\'t find face, using old postion'
             self.frames_since_face += 1
             f = self.last_face_position
             rect(image, f, (0, 100, 200))
