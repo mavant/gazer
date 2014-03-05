@@ -5,6 +5,7 @@ import os
 import time
 
 import cv
+import cv2
 import numpy
 
 import cvnumpyconvert
@@ -144,9 +145,9 @@ class EyeTracker(object):
             return eye_pair
 
     def find_face(self, image):
-        w, h = cv.GetSize(image)
+        h, w, d = image.shape
         grayscale = cv.CreateImage((w, h), 8, 1)
-        cv.CvtColor(image, grayscale, cv.CV_BGR2GRAY)
+        cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         faces = cv.HaarDetectObjects(grayscale, self.face_cascade, self.storage, 1.2, 2, 0, (300, 250))
 
         if faces:
@@ -174,14 +175,14 @@ def rect(image, result, color=(0,0,255)):
 
 if __name__ == '__main__':
 
-    cv.NamedWindow('a_window', cv.CV_WINDOW_AUTOSIZE)
+    cv2.namedWindow('a_window', cv2.CV_WINDOW_AUTOSIZE)
 
     et = EyeTracker()
     while True:
-        capture = cv.CaptureFromCAM(0)
-        image = cv.QueryFrame(capture)
-        et.detect(image)
-
-        cv.ShowImage('asdf', image)
-
+        cap = cv2.VideoCapture(0)
+        ret, image = cap.read()
+	print ret
+	if image is not None:
+	     et.detect(image)
+	     cv2.imshow('a_window', image)
     raw_input()
