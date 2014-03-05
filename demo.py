@@ -137,12 +137,12 @@ class EyeTracker(object):
         cv.Copy(src_region, small)
         grayscale = cv.CreateImage((f[2], f[3]*2/3), 8, 1)
         cv.CvtColor(small, grayscale, cv.CV_BGR2GRAY)
+	#eyecascade = cv2.CascadeClassifier('parojosG-45x11.xml')
+        #eye_pairs = eyecascade.detectMultiScale(src_region, 10, 10)
         eye_pairs = cv.HaarDetectObjects(grayscale, self.eye_cascade, self.storage, 1.2, 2, 0, (10, 10))
         for eye_pair in eye_pairs:
-            eye_pair = (eye_pair[0][0]+f[0], eye_pair[1]+f[1], eye_pair[0][2], eye_pair[0][3])
-	    #eye_pair = ((eye_pair[0][0]+f[0], eye_pair[1]+f[1],
-            #    eye_pair[0][2], eye_pair[0][3]), eye_pair[1])
-            rect(image, eye_pair, (255,0,0))
+            eye_pair = (eye_pair[0][0]+f[0], eye_pair[0][1]+f[1], eye_pair[0][2], eye_pair[0][3])
+            rect(image, eye_pair, (255,0,255))
             return eye_pair
 
     def find_face(self, image):
@@ -187,6 +187,6 @@ if __name__ == '__main__':
 	if image is not None:
 	     et.detect(image)
 	     cv2.imshow('a_window', image)
-     	     cv2.waitKey(40)
+     	     cv2.waitKey(100)
     cv2.destroyAllWindows()
     raw_input()
