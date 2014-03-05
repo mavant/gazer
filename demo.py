@@ -8,16 +8,16 @@ import cv
 import numpy
 
 import cvnumpyconvert
-from mouse import setMousePosition
+
 
 class EyeTracker(object):
     def __init__(self):
         self.storage = cv.CreateMemStorage(0)
         self.last_face_position = None
-        self.face_cascade = cv.Load(os.path.expanduser('~/Downloads/haarcascade_frontalface_default.xml'))
+        self.face_cascade = cv.Load(os.path.expanduser('haarcascade_frontalface_default.xml'))
         #self.face_cascade = cv.Load('haarcascade_frontalface_alt.xml')
         #self.eye_cascade = cv.Load(os.path.expanduser('~/Downloads/parojos-22x15.xml'))
-        self.eye_cascade = cv.Load(os.path.expanduser('~/Downloads/parojosG-45x11.xml'))
+        self.eye_cascade = cv.Load(os.path.expanduser('parojosG-45x11.xml'))
         self.detect_times = []
         self.eye_pair_history = []
         self.xamount_histories = [[], []]
@@ -120,7 +120,7 @@ class EyeTracker(object):
             xsmoothed = sum(self.xpos_history[-smooth:]) / len(self.xpos_history[-smooth:])
             ysmoothed = sum(self.ypos_history[-smooth:]) / len(self.ypos_history[-smooth:])
             #setMousePosition(xsmoothed, ysmoothed)
-            setMousePosition(xsmoothed, ysmoothed)
+            #setMousePosition(xsmoothed, ysmoothed)
 
 
 
