@@ -9,6 +9,7 @@ import numpy
 
 import cvnumpyconvert
 
+from mouse import setMousePosition
 
 class EyeTracker(object):
     def __init__(self):
@@ -119,8 +120,7 @@ class EyeTracker(object):
             smooth = 20
             xsmoothed = sum(self.xpos_history[-smooth:]) / len(self.xpos_history[-smooth:])
             ysmoothed = sum(self.ypos_history[-smooth:]) / len(self.ypos_history[-smooth:])
-            #setMousePosition(xsmoothed, ysmoothed)
-            #setMousePosition(xsmoothed, ysmoothed)
+            setMousePosition(xsmoothed, ysmoothed)
 
 
 
