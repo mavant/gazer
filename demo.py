@@ -176,10 +176,9 @@ def rect(image, result, color=(0,0,255)):
 if __name__ == '__main__':
 
     cv2.namedWindow('a_window', cv2.CV_WINDOW_AUTOSIZE)
-
+    cap = cv2.VideoCapture(0)
     et = EyeTracker()
     while True:
-        cap = cv2.VideoCapture(0)
         ret, image = cap.read()
 	print ret
 	if image is not None:
