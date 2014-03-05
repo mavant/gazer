@@ -29,7 +29,7 @@ class EyeTracker(object):
 
     def detect(self, image):
         f = self.find_face(image)
-        if f:
+        if f.size > 0:
             eyes = self.find_eyes(image, f)
             if eyes:
                 rolling_eyes = self.rolling_eye_pair(eyes, samples=5)
@@ -42,8 +42,8 @@ class EyeTracker(object):
         self.eye_pair_history.append(eye_pair)
         ave_eye_pair = [0,0,0,0]
         for i in range(4):
-            ave_eye_pair[i] = sum([es[0][i] for es in self.eye_pair_history])/len(self.eye_pair_history)
-        rect(image, [ave_eye_pair], (100,110,30))
+            ave_eye_pair[i] = sum([es[i] for es in self.eye_pair_history])/len(self.eye_pair_history)
+        rect(image, ave_eye_pair, (100,110,30))
         return [ave_eye_pair, '?']
 
     def fps(self, display=True):
@@ -56,14 +56,14 @@ class EyeTracker(object):
             self.detect_times.pop(0)
 
     def find_pupils(self, image, eyes):
-        w, h = cv.GetSize(image)
+        h, w, d = image.shape
         left  = cv.CreateImage((eyes[0][2]/3, eyes[0][3]*2/3,), 8, 3)
         right = cv.CreateImage((eyes[0][2]/3, eyes[0][3]*2/3,), 8, 3)
         left_gray  = cv.CreateImage((eyes[0][2]/3, eyes[0][3]*2/3,), 8, 1)
         right_gray = cv.CreateImage((eyes[0][2]/3, eyes[0][3]*2/3,), 8, 1)
-        left_region = cv.GetSubRect(image, (eyes[0][0], eyes[0][1]+eyes[0][3]/6,
+        left_region = cv.GetSubRect(cv.fromarray(image), (eyes[0][0], eyes[0][1]+eyes[0][3]/6,
             eyes[0][2]/3, eyes[0][3]*2/3))
-        right_region = cv.GetSubRect(image, (eyes[0][0]+eyes[0][2]*2/3, eyes[0][1]+eyes[0][3]/6,
+        right_region = cv.GetSubRect(cv.fromarray(image), (eyes[0][0]+eyes[0][2]*2/3, eyes[0][1]+eyes[0][3]/6,
             eyes[0][2]/3, eyes[0][3]*2/3))
         cv.Copy(left_region, left)
         cv.Copy(right_region, right)
@@ -130,17 +130,18 @@ class EyeTracker(object):
         #raw_input()
 
     def find_eyes(self, image, f):
-        w, h = cv.GetSize(image)
-        small = cv.CreateImage((f[0][2], f[0][3]*2/3,), 8, 3)
-        src_region = cv.GetSubRect(image, (f[0][0], f[0][1],
-            f[0][2], f[0][3]*2/3))
+        h, w, d = image.shape
+        small = cv.CreateImage((f[2], f[3]*2/3,), 8, 3)
+        src_region = cv.GetSubRect(cv.fromarray(image), (f[0], f[1],
+            f[2], f[3]*2/3))
         cv.Copy(src_region, small)
-        grayscale = cv.CreateImage((f[0][2], f[0][3]*2/3), 8, 1)
+        grayscale = cv.CreateImage((f[2], f[3]*2/3), 8, 1)
         cv.CvtColor(small, grayscale, cv.CV_BGR2GRAY)
         eye_pairs = cv.HaarDetectObjects(grayscale, self.eye_cascade, self.storage, 1.2, 2, 0, (10, 10))
         for eye_pair in eye_pairs:
-            eye_pair = ((eye_pair[0][0]+f[0][0], eye_pair[0][1]+f[0][1],
-                eye_pair[0][2], eye_pair[0][3]), eye_pair[1])
+            eye_pair = (eye_pair[0][0]+f[0], eye_pair[1]+f[1], eye_pair[0][2], eye_pair[0][3])
+	    #eye_pair = ((eye_pair[0][0]+f[0], eye_pair[1]+f[1],
+            #    eye_pair[0][2], eye_pair[0][3]), eye_pair[1])
             rect(image, eye_pair, (255,0,0))
             return eye_pair
 
@@ -148,9 +149,12 @@ class EyeTracker(object):
         h, w, d = image.shape
         grayscale = cv.CreateImage((w, h), 8, 1)
         cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        faces = cv.HaarDetectObjects(grayscale, self.face_cascade, self.storage, 1.2, 2, 0, (300, 250))
+        cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+	faces = cascade.detectMultiScale(image)
+	#faces = cascade.detectMultiScale(image, 1.2, 2, 0, 300, 250)
+        #faces = cv.HaarDetectObjects(grayscale, self.face_cascade, self.storage, 1.2, 2, 0, (300, 250))
 
-        if faces:
+        if faces.size > 0:
             print 'face detected!'
             for f in faces:
                 rect(image, f, (0, 255, 0))
@@ -168,8 +172,8 @@ class EyeTracker(object):
 
 def rect(image, result, color=(0,0,255)):
     f = result
-    cv.Rectangle(image, (f[0][0], f[0][1]),
-            (f[0][0]+f[0][2], f[0][1]+f[0][3]),
+    cv2.rectangle(image, (f[0], f[1]),
+            (f[0]+f[2], f[1]+f[3]),
             cv.RGB(*color), 3, 8, 0)
 
 
