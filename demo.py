@@ -175,7 +175,7 @@ def rect(image, result, color=(0,0,255)):
 
 if __name__ == '__main__':
 
-    cv2.namedWindow('a_window', cv2.WINDOW_NORMAL)
+    cv2.namedWindow('a_window', cv2.WINDOW_AUTOSIZE)
     cap = cv2.VideoCapture(0)
     et = EyeTracker()
     while True:
@@ -183,4 +183,6 @@ if __name__ == '__main__':
 	if image is not None:
 	     et.detect(image)
 	     cv2.imshow('a_window', image)
+     	     cv2.waitKey(40)
+    cv2.destroyAllWindows()
     raw_input()
